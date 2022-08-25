@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rare_crew_test/src/models/task_model.dart';
+import 'package:rare_crew_test/src/resources/database/hive_operations.dart';
+import 'package:uuid/uuid.dart';
+
+import '../../models/task_model.dart';
 
 final addOrEditTaskNotifierController =
     ChangeNotifierProvider<AddOrEditTaskNotifierController>(
@@ -8,6 +11,8 @@ final addOrEditTaskNotifierController =
 
 class AddOrEditTaskNotifierController extends ChangeNotifier {
   AddOrEditTaskNotifierController() : super();
+  final Database database = Database();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   TextEditingController taskNameController = TextEditingController();
   TextEditingController dateController = TextEditingController();
@@ -15,15 +20,24 @@ class AddOrEditTaskNotifierController extends ChangeNotifier {
   TextEditingController descriptionController = TextEditingController();
 
   int selectedpriority = 0;
-  List<Color> priorityColors = const [
-    Color(0xffFC5565),
-    Color(0xffFA9B4A),
-    Color(0xff58BBF7),
-    Color(0xff4CCB41),
-  ];
   void selectPriority(int index) {
     selectedpriority = index;
     notifyListeners();
     // state = selectedpriority;
+  }
+
+  Future<bool> addNewTask() async {
+    if (formKey.currentState!.validate()) {
+      final Task task = Task(
+          id: const Uuid().v4(),
+          date: DateTime.parse(dateController.text),
+          category: categoryController.text,
+          taskName: taskNameController.text,
+          description: descriptionController.text,
+          priority: selectedpriority);
+      final bool save = await database.save(task: task);
+      return save;
+    }
+    return false;
   }
 }

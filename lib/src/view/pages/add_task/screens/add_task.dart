@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rare_crew_test/src/providers/add_task_notifier/add_task_notifier.dart';
 import 'package:rare_crew_test/src/view/pages/auth/widgets/auth_button.dart';
+import 'package:rare_crew_test/src/view/utils/app_form_validator.dart';
+import 'package:rare_crew_test/src/view/utils/constants.dart';
 import 'package:rare_crew_test/src/view/utils/custom_text_field.dart';
 import 'package:rare_crew_test/src/view/utils/reusable_app_bar.dart';
 import '../../../utils/my_colors.dart';
@@ -38,39 +40,51 @@ class AddOrEditTaskScreen extends StatelessWidget {
                 //final Task task = ref.watch(addOrEditTaskNotifierController);
                 final AddOrEditTaskNotifierController controller =
                     ref.read(addOrEditTaskNotifierController.notifier);
-                return Column(
-                  children: [
-                    CustomTextField(
-                      textEditingController: controller.taskNameController,
-                      lable: 'Task Name',
-                      hint: 'Task name',
-                    ),
-                    const Divider(
-                      color: MyColors.borderColor,
-                    ),
-                    CustomTextField(
-                      textEditingController: controller.descriptionController,
-                      lable: 'Description',
-                      hint: 'description',
-                      isMultiline: true,
-                    ),
-                    const Divider(
-                      color: MyColors.borderColor,
-                    ),
-                    CustomTextField(
-                      lable: 'Category',
-                      hint: 'category',
-                      textEditingController: controller.categoryController,
-                    ),
-                    const Divider(
-                      color: MyColors.borderColor,
-                    ),
-                    CustomTextField(
-                      lable: 'Pick Date',
-                      hint: 'pick date & time',
-                      textEditingController: controller.dateController,
-                    ),
-                  ],
+                return Form(
+                  key: controller.formKey,
+                  child: Column(
+                    children: [
+                      CustomTextField(
+                        textEditingController: controller.taskNameController,
+                        lable: 'Task Name',
+                        hint: 'Task name',
+                        validator: AppFormValidator.generalEmptyValidator,
+                      ),
+                      const Divider(
+                        color: MyColors.borderColor,
+                      ),
+                      CustomTextField(
+                        textEditingController: controller.descriptionController,
+                        lable: 'Description',
+                        hint: 'description',
+                        isMultiline: true,
+                        validator: AppFormValidator.generalEmptyValidator,
+                      ),
+                      const Divider(
+                        color: MyColors.borderColor,
+                      ),
+                      CustomTextField(
+                        lable: 'Category',
+                        hint: 'category',
+                        textEditingController: controller.categoryController,
+                        validator: AppFormValidator.generalEmptyValidator,
+                      ),
+                      const Divider(
+                        color: MyColors.borderColor,
+                      ),
+                      CustomTextField(
+                        onTap: () {
+                          Constants.selectDate().then(
+                              (value) => controller.dateController.text = value ?? '');
+                        },
+                        lable: 'Pick Date',
+                        validator: AppFormValidator.generalEmptyValidator,
+                        readOnly: true,
+                        hint: 'pick date & time',
+                        textEditingController: controller.dateController,
+                      ),
+                    ],
+                  ),
                 );
               }),
             ),
@@ -119,8 +133,8 @@ class AddOrEditTaskScreen extends StatelessWidget {
                           itemBuilder: (c, i) => InkWell(
                                 onTap: () {
                                   controller.selectPriority(i);
-                                  print("clicked");
-                                  print(controller.selectedpriority);
+                                  // print("clicked");
+                                  // print(controller.selectedpriority);
                                 },
                                 child: Container(
                                   width: 20,
@@ -129,7 +143,7 @@ class AddOrEditTaskScreen extends StatelessWidget {
                                     border: task.selectedpriority != i
                                         ? null
                                         : Border.all(color: Colors.black45, width: 2),
-                                    color: controller.priorityColors[i],
+                                    color: Constants.priorityColors[i],
                                     shape: BoxShape.circle,
                                     //borderRadius: BorderRadius.all(Radius.elliptical(9999.0, 9999.0)),
                                   ),
@@ -138,19 +152,25 @@ class AddOrEditTaskScreen extends StatelessWidget {
                           separatorBuilder: (c, i) => const SizedBox(
                                 width: 20,
                               ),
-                          itemCount: controller.priorityColors.length)));
+                          itemCount: Constants.priorityColors.length)));
             },
           ),
           const SizedBox(
             height: 20,
           ),
           Center(
-            child: AuthButton(
-              title: 'Add task',
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
+            child: Consumer(builder: (context, ref, child) {
+              //final Task task = ref.watch(addOrEditTaskNotifierController);
+              final AddOrEditTaskNotifierController controller =
+                  ref.read(addOrEditTaskNotifierController.notifier);
+              return AuthButton(
+                title: 'Add task',
+                onTap: () {
+                  controller.addNewTask();
+                  //   Navigator.pop(context);
+                },
+              );
+            }),
           ),
         ],
       )),
