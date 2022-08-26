@@ -9,7 +9,7 @@ mixin Constants {
     Color(0xff4CCB41),
   ];
   static const String taskBoxName = 'tasks';
-  static const String userBoxName = 'user';
+ // static const String userBoxName = 'user';
 
   static final navigatorKey = GlobalKey<NavigatorState>();
 

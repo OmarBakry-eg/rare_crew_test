@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:rare_crew_test/src/models/task_model.dart';
 import '../../view/utils/constants.dart';
@@ -84,29 +83,16 @@ class HiveDatabase implements HiveOperations {
     }
   }
 
-  @override
-  String? getUserIfExsiting() {
-    try {
-      String email = Hive.box(Constants.userBoxName).values.toList().first as String;
-      String value = email.split('@').first;
-      return value;
-    } catch (e) {
-      WidgetsBinding.instance.addPostFrameCallback(
-          (_) => Constants.errorMessage(description: '$e in getUser'));
-      return null;
-    }
-  }
-
-  @override
-  Future<bool> setUser({required String email}) async {
-    try {
-      await Hive.box(Constants.userBoxName).add(email);
-      return true;
-    } catch (e) {
-      Constants.errorMessage(description: '$e in setUser');
-      return false;
-    }
-  }
+  // @override
+  // Future<bool> setUser({required String email}) async {
+  //   try {
+  //     await Hive.box(Constants.userBoxName).add(email);
+  //     return true;
+  //   } catch (e) {
+  //     Constants.errorMessage(description: '$e in setUser');
+  //     return false;
+  //   }
+  // }
 
   @override
   Future<bool> clearBox(String boxName) async {

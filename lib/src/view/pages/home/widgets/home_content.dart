@@ -15,7 +15,8 @@ import '../../auth/widgets/reg_button.dart';
 
 class HomeContent extends StatelessWidget {
   final bool isLogout;
-  const HomeContent({Key? key, required this.isLogout}) : super(key: key);
+  final String? username;
+  const HomeContent({Key? key, required this.isLogout,this.username = ''}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -44,47 +45,36 @@ class HomeContent extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Consumer(
-                        builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                      final AuthNotifierController controller =
-                          ref.read(authNotifierController.notifier);
-                           final AuthNotifierController data =
-                  ref.watch(authNotifierController);
-                      // WidgetsBinding.instance
-                      //     .addPostFrameCallback((_) =>
-                     controller.getUserName();
-                      //);
-                      return Text.rich(
-                        TextSpan(
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 20,
-                            color: Color(0xff172735),
-                            letterSpacing: 0.42,
-                          ),
-                          children: [
-                            const TextSpan(
-                              text: 'Good Morning',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                            const TextSpan(
-                              text: ' ',
-                            ),
-                            TextSpan(
-                              text: data.username.capitalize,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
+                    Text.rich(
+                      TextSpan(
+                        style: const TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: 20,
+                          color: Color(0xff172735),
+                          letterSpacing: 0.42,
                         ),
-                        textHeightBehavior:
-                            const TextHeightBehavior(applyHeightToFirstAscent: false),
-                        softWrap: false,
-                      );
-                    }),
+                        children: [
+                          const TextSpan(
+                            text: 'Good Morning',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                          const TextSpan(
+                            text: ' ',
+                          ),
+                          TextSpan(
+                            text: username?.capitalize,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      textHeightBehavior:
+                          const TextHeightBehavior(applyHeightToFirstAscent: false),
+                      softWrap: false,
+                    ),
                     const SizedBox(
                       height: 10,
                     ),

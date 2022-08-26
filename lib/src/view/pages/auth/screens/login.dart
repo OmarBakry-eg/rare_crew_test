@@ -97,7 +97,8 @@ class LoginPage extends StatelessWidget {
                             Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (c) => const HomePage(
+                                    builder: (c) =>  HomePage(
+                                        username: controller.username,
                                         //isSignup: !isSignup,
                                         )));
                           }

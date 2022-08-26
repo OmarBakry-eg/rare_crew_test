@@ -15,6 +15,6 @@ void main() async {
   Hive.init(appDoc.path);
   Hive.registerAdapter(TaskAdapter());
   Hive.openBox(Constants.taskBoxName);
-  Hive.openBox(Constants.userBoxName);
+ // Hive.openBox(Constants.userBoxName);
   runApp(const ProviderScope(child: MyApp()));
 }

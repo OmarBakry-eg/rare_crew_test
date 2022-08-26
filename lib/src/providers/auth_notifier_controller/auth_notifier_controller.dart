@@ -30,17 +30,18 @@ class AuthNotifierController extends ChangeNotifier {
 
   Future<bool> authenticateUser(bool signup) => _userAuth(signup);
 
-  String? getUserName()  {
-    final String? email =  database.getUserIfExsiting();
-    username = email ?? '';
-    print("username $username");
-    notifyListeners();
-    return email;
-  }
+  // String? getUserName()  {
+  //   final String? email =  database.getUserIfExsiting();
+  //   username = email ?? '';
+  //   print("username $username");
+  //   notifyListeners();
+  //   return email;
+  // }
 
   Future<bool> logout() async {
     username = '';
-    return await database.clearBox(Constants.userBoxName);
+    return true;
+    //return await database.clearBox(Constants.userBoxName);
   }
 
   String _authMode(bool signup) => signup ? "Signup" : "Login";
@@ -61,8 +62,9 @@ class AuthNotifierController extends ChangeNotifier {
       if (credential.user != null &&
           credential.user!.email != null &&
           credential.user!.email!.isNotEmpty) {
-        await database.setUser(email: credential.user!.email!);
+        // await database.setUser(email: credential.user!.email!);
         log("userdata ${credential.user?.email}");
+        username = credential.user?.email?.split('@').first ?? "";
         clearTextFields();
         return true;
       }

@@ -7,7 +7,8 @@ import 'package:rare_crew_test/src/view/utils/reusable_app_bar.dart';
 import '../widgets/home_content.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final String username;
+  const HomePage({Key? key,required this.username}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +22,13 @@ class HomePage extends StatelessWidget {
           final int value = ref.watch(homeNotifierController);
           return IndexedStack(
             index: value,
-            children: const [
+            children:  [
               HomeContent(
+                username: username,
                 isLogout: false,
               ),
               HomeContent(
+                username: username,
                 isLogout: true,
               )
             ],
