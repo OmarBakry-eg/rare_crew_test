@@ -16,7 +16,7 @@ mixin Constants {
       {String? title, String? description, Function? onPressed}) async {
     return showDialog<void>(
       context: navigatorKey.currentContext!,
-      // barrierDismissible: false,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(title ?? "Alert"),
@@ -59,8 +59,10 @@ mixin Constants {
           DateTime(DateTime.now().year + 100, DateTime.now().month, DateTime.now().day),
     );
     if (picked != null) {
-      return DateFormat('yyyy-MM-dd').format(picked);
+      return formattedDate(picked);
     }
     return null;
   }
+
+  static String formattedDate(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
 }

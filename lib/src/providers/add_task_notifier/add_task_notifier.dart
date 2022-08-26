@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rare_crew_test/src/resources/database/hive_operations.dart';
+import 'package:rare_crew_test/src/view/utils/constants.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../models/task_model.dart';
@@ -11,6 +12,7 @@ final addOrEditTaskNotifierController =
 
 class AddOrEditTaskNotifierController extends ChangeNotifier {
   AddOrEditTaskNotifierController() : super();
+
   final Database database = Database();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -26,6 +28,37 @@ class AddOrEditTaskNotifierController extends ChangeNotifier {
     // state = selectedpriority;
   }
 
+  bool isTaskListEmpty = false;
+
+  bool checkTaskList() {
+    if (database.readListOfItems().isEmpty) {
+      isTaskListEmpty = true;
+      notifyListeners();
+      return true;
+    }
+    isTaskListEmpty = false;
+    notifyListeners();
+    return false;
+  }
+
+  Future<bool> updateOldTask(int index, Task task) async {
+    if (formKey.currentState!.validate()) {
+      final Task updatedTask = Task(
+          id: task.id,
+          date: DateTime.parse(dateController.text),
+          category: categoryController.text,
+          taskName: taskNameController.text,
+          description: descriptionController.text,
+          priority: selectedpriority);
+      final bool update = await database.updateItem(index, updatedTask);
+      if (update) {
+        clearTextFields();
+      }
+      return update;
+    }
+    return false;
+  }
+
   Future<bool> addNewTask() async {
     if (formKey.currentState!.validate()) {
       final Task task = Task(
@@ -36,8 +69,25 @@ class AddOrEditTaskNotifierController extends ChangeNotifier {
           description: descriptionController.text,
           priority: selectedpriority);
       final bool save = await database.save(task: task);
+      if (save) {
+        clearTextFields();
+      }
       return save;
     }
     return false;
+  }
+
+  void fillTextFieldsData(Task task) {
+    taskNameController.text = task.taskName;
+    dateController.text = Constants.formattedDate(task.date);
+    categoryController.text = task.category;
+    descriptionController.text = task.description ?? '';
+  }
+
+  void clearTextFields() {
+    taskNameController.clear();
+    dateController.clear();
+    categoryController.clear();
+    descriptionController.clear();
   }
 }

@@ -31,10 +31,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     log("LifecycleWatcherState#didChangeAppLifecycleState state=${state.toString()}");
     if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
- //     await Hive.close();
+    await Hive.close();
     }
     if (state == AppLifecycleState.resumed) {
-     // await Hive.openBox(Constants.taskBoxName);
+    await Hive.openBox(Constants.taskBoxName);
     }
   }
   

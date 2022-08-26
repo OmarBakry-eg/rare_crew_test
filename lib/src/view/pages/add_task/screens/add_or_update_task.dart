@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rare_crew_test/src/models/task_model.dart';
 import 'package:rare_crew_test/src/providers/add_task_notifier/add_task_notifier.dart';
 import 'package:rare_crew_test/src/view/pages/auth/widgets/auth_button.dart';
 import 'package:rare_crew_test/src/view/utils/app_form_validator.dart';
@@ -9,7 +10,9 @@ import 'package:rare_crew_test/src/view/utils/reusable_app_bar.dart';
 import '../../../utils/my_colors.dart';
 
 class AddOrEditTaskScreen extends StatelessWidget {
-  const AddOrEditTaskScreen({Key? key}) : super(key: key);
+  final Task? task;
+  final int? index;
+  const AddOrEditTaskScreen({Key? key, this.index, this.task}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +43,12 @@ class AddOrEditTaskScreen extends StatelessWidget {
                 //final Task task = ref.watch(addOrEditTaskNotifierController);
                 final AddOrEditTaskNotifierController controller =
                     ref.read(addOrEditTaskNotifierController.notifier);
+                if (task == null) {
+                  controller.clearTextFields();
+                } else {
+                  controller.fillTextFieldsData(task!);
+                }
+
                 return Form(
                   key: controller.formKey,
                   child: Column(
@@ -164,9 +173,14 @@ class AddOrEditTaskScreen extends StatelessWidget {
               final AddOrEditTaskNotifierController controller =
                   ref.read(addOrEditTaskNotifierController.notifier);
               return AuthButton(
-                title: 'Add task',
+                title: task != null ? "Update Task" : 'Add task',
                 onTap: () {
-                  controller.addNewTask();
+                  if (task == null) {
+                    controller.addNewTask();
+                  } else {
+                    controller.updateOldTask(index!, task!);
+                  }
+
                   //   Navigator.pop(context);
                 },
               );
