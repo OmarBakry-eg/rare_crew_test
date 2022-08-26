@@ -9,12 +9,13 @@ mixin Constants {
     Color(0xff4CCB41),
   ];
   static const String taskBoxName = 'tasks';
+  static const String userBoxName = 'user';
 
   static final navigatorKey = GlobalKey<NavigatorState>();
 
   static Future<void> errorMessage(
       {String? title, String? description, Function? onPressed}) async {
-    return showDialog<void>(
+    return  showDialog<void>(
       context: navigatorKey.currentContext!,
       barrierDismissible: true,
       builder: (BuildContext context) {
@@ -28,12 +29,6 @@ mixin Constants {
             ),
           ),
           actions: <Widget>[
-            // TextButton(
-            //   child: const Text('Cancel'),
-            //   onPressed: () {
-            //     Navigator.of(context).pop();
-            //   },
-            // ),
             TextButton(
               child: const Text('Ok'),
               onPressed: () {
@@ -48,6 +43,19 @@ mixin Constants {
       },
     );
   }
+
+  static Future<void> showLoading(
+      {String? title, String? description, Function? onPressed}) async {
+    return showDialog<void>(
+      context: navigatorKey.currentContext!,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+
+  static void hideLoading() => navigatorKey.currentState!.pop();
 
   static Future<String?> selectDate(
       {DateTime? initialDate, DateTime? firstDate, DateTime? lastDate}) async {

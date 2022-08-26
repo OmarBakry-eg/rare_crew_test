@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rare_crew_test/src/providers/auth_notifier_controller/auth_notifier_controller.dart';
 import 'package:rare_crew_test/src/view/pages/auth/widgets/auth_button.dart';
 import 'package:rare_crew_test/src/view/pages/auth/widgets/reg_button.dart';
 import 'package:rare_crew_test/src/view/pages/home/screens/home.dart';
+import 'package:rare_crew_test/src/view/utils/app_form_validator.dart';
 import 'package:rare_crew_test/src/view/utils/custom_text_field.dart';
 import 'package:rare_crew_test/src/view/utils/images_class.dart';
 import 'package:rare_crew_test/src/view/utils/my_colors.dart';
@@ -14,8 +17,6 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController userNameController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
     return Scaffold(
       body: Center(
         heightFactor: 1.9,
@@ -43,46 +44,70 @@ class LoginPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: Column(
-                    children: [
-                      CustomTextField(
-                        textEditingController: userNameController,
-                        lable: 'Username',
-                        hint: 'Omar',
-                        prefixIcon: Image.asset(
-                          ImageString.personIcon,
-                          width: 25,
-                          height: 25,
+                  child: Consumer(
+                    builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                      final AuthNotifierController controller =
+                          ref.read(authNotifierController.notifier);
+                      return Form(
+                        key: controller.formKey(isSignup),
+                        child: Column(
+                          children: [
+                            CustomTextField(
+                              textEditingController: controller.emailController,
+                              lable: 'Username',
+                              hint: 'Omar',
+                              validator: AppFormValidator.generalEmailValidator,
+                              prefixIcon: Image.asset(
+                                ImageString.personIcon,
+                                width: 25,
+                                height: 25,
+                              ),
+                            ),
+                            const Divider(
+                              color: MyColors.borderColor,
+                            ),
+                            CustomTextField(
+                              textEditingController: controller.passwordController,
+                              lable: 'Password',
+                              isPassword: true,
+                              validator: AppFormValidator.generalPasswordValidator,
+                              hint: '******',
+                              prefixIcon: Image.asset(
+                                ImageString.lockIcon,
+                                width: 25,
+                                height: 25,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const Divider(
-                        color: MyColors.borderColor,
-                      ),
-                      CustomTextField(
-                        textEditingController: passwordController,
-                        lable: 'Password',
-                        isPassword: true,
-                        hint: '******',
-                        prefixIcon: Image.asset(
-                          ImageString.lockIcon,
-                          width: 25,
-                          height: 25,
-                        ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ),
-              AuthButton(
-                onTap: () {
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (c) => const HomePage(
-                              //isSignup: !isSignup,
-                              )));
+              Consumer(
+                builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                  final AuthNotifierController controller =
+                      ref.read(authNotifierController.notifier);
+                  return AuthButton(
+                    onTap: () async {
+                      if (controller.formKey(isSignup).currentState!.validate()) {
+                        await controller.authenticateUser(isSignup).then((value) {
+                          if (value) {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (c) => const HomePage(
+                                        //isSignup: !isSignup,
+                                        )));
+                          }
+                          return value;
+                        });
+                      }
+                    },
+                    title: isSignup ? "SIGNUP" : 'LOGIN',
+                  );
                 },
-                title: isSignup ? "SIGNUP" : 'LOGIN',
               ),
               const SizedBox(
                 height: 20,
@@ -91,15 +116,22 @@ class LoginPage extends StatelessWidget {
               const SizedBox(
                 height: 20,
               ),
-              RegButton(
-                title: !isSignup ? "Signup" : "Login",
-                onTap: () {
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (c) => LoginPage(
-                                isSignup: !isSignup,
-                              )));
+              Consumer(
+                builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                  final AuthNotifierController controller =
+                      ref.read(authNotifierController.notifier);
+                  return RegButton(
+                    title: !isSignup ? "Signup" : "Login",
+                    onTap: () {
+                      controller.clearTextFields();
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (c) => LoginPage(
+                                    isSignup: !isSignup,
+                                  )));
+                    },
+                  );
                 },
               ),
             ],

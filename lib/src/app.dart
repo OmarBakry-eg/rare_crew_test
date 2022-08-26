@@ -35,6 +35,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
     if (state == AppLifecycleState.resumed) {
     await Hive.openBox(Constants.taskBoxName);
+    await Hive.openBox(Constants.userBoxName);
     }
   }
   

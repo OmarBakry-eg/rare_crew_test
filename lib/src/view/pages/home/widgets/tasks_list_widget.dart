@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart' as intl;
 import '../../../../models/task_model.dart';
-import '../../../../resources/database/hive_operations.dart';
+import '../../../../resources/database/hive_database.dart';
 import '../../../utils/constants.dart';
 import '../../add_task/screens/add_or_update_task.dart';
 
 class TasksListWidget extends StatelessWidget {
-  final Database database;
+  final HiveDatabase database;
   final List<dynamic> tasks;
   const TasksListWidget({Key? key, required this.database, required this.tasks})
       : super(key: key);
@@ -33,7 +33,7 @@ class TasksListWidget extends StatelessWidget {
                       //   return
                       SlidableAction(
                         onPressed: (context) {
-                          database.delete(i);
+                          database.deleteElementFromBox(i);
                           // ref.read(addOrEditTaskNotifierController).checkTaskList();
                         },
                         backgroundColor: const Color(0xFFFE4A49),

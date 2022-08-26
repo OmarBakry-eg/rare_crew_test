@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rare_crew_test/src/resources/database/hive_operations.dart';
+import 'package:rare_crew_test/src/resources/database/hive_database.dart';
 import 'package:rare_crew_test/src/view/utils/constants.dart';
 import 'package:uuid/uuid.dart';
 
@@ -13,7 +13,7 @@ final addOrEditTaskNotifierController =
 class AddOrEditTaskNotifierController extends ChangeNotifier {
   AddOrEditTaskNotifierController() : super();
 
-  final Database database = Database();
+  final HiveDatabase database = HiveDatabase();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   TextEditingController taskNameController = TextEditingController();
@@ -26,19 +26,6 @@ class AddOrEditTaskNotifierController extends ChangeNotifier {
     selectedpriority = index;
     notifyListeners();
     // state = selectedpriority;
-  }
-
-  bool isTaskListEmpty = false;
-
-  bool checkTaskList() {
-    if (database.readListOfItems().isEmpty) {
-      isTaskListEmpty = true;
-      notifyListeners();
-      return true;
-    }
-    isTaskListEmpty = false;
-    notifyListeners();
-    return false;
   }
 
   Future<bool> updateOldTask(int index, Task task) async {
@@ -68,7 +55,7 @@ class AddOrEditTaskNotifierController extends ChangeNotifier {
           taskName: taskNameController.text,
           description: descriptionController.text,
           priority: selectedpriority);
-      final bool save = await database.save(task: task);
+      final bool save = await database.saveTask(task: task);
       if (save) {
         clearTextFields();
       }

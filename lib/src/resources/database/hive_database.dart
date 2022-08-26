@@ -1,34 +1,27 @@
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:rare_crew_test/src/models/task_model.dart';
 import '../../view/utils/constants.dart';
+import '../abstract_classes/hive_operation.dart';
 
-abstract class HiveOperations {
-  Future<bool> updateItem(int index, Task item);
-  List<dynamic> readListOfItems();
-  Future<bool> save({required Task task});
-  Future<bool> open();
-  Future<bool> delete(int index);
-  bool isOpen();
-}
-
-class Database implements HiveOperations {
+class HiveDatabase implements HiveOperations {
   @override
-  bool isOpen() {
-    return Hive.isBoxOpen(Constants.taskBoxName);
+  bool isOpen(String boxName) {
+    return Hive.isBoxOpen(boxName);
   }
 
   @override
-  Future<bool> open() async {
-    final bool isOpend = isOpen();
+  Future<bool> open(String boxName) async {
+    final bool isOpend = isOpen(boxName);
     if (isOpend) {
       return Future.value(isOpend);
     } else {
       try {
-        final Box<dynamic> openHive = await Hive.openBox(Constants.taskBoxName);
+        final Box<dynamic> openHive = await Hive.openBox(boxName);
         if (openHive.isOpen) {
           return true;
         } else {
-          Constants.errorMessage(description: 'Cannot open hive');
+          Constants.errorMessage(description: 'Cannot open hive $boxName');
           return false;
         }
       } catch (e) {
@@ -45,7 +38,7 @@ class Database implements HiveOperations {
   }
 
   @override
-  Future<bool> save({required Task task}) async {
+  Future<bool> saveTask({required Task task}) async {
     return await Hive.box(Constants.taskBoxName).add(task).then((value) {
       Constants.errorMessage(
           description: 'Task saved',
@@ -78,7 +71,7 @@ class Database implements HiveOperations {
   }
 
   @override
-  Future<bool> delete(int index) async {
+  Future<bool> deleteElementFromBox(int index) async {
     try {
       await Hive.box(Constants.taskBoxName).deleteAt(index);
       // Constants.errorMessage(description: 'Task deleted', title: "Done");
@@ -87,6 +80,41 @@ class Database implements HiveOperations {
       Constants.errorMessage(
         description: '$e in delete',
       );
+      return false;
+    }
+  }
+
+  @override
+  String? getUserIfExsiting() {
+    try {
+      String email = Hive.box(Constants.userBoxName).values.toList().first as String;
+      String value = email.split('@').first;
+      return value;
+    } catch (e) {
+      WidgetsBinding.instance.addPostFrameCallback(
+          (_) => Constants.errorMessage(description: '$e in getUser'));
+      return null;
+    }
+  }
+
+  @override
+  Future<bool> setUser({required String email}) async {
+    try {
+      await Hive.box(Constants.userBoxName).add(email);
+      return true;
+    } catch (e) {
+      Constants.errorMessage(description: '$e in setUser');
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> clearBox(String boxName) async {
+    try {
+      await Hive.box(boxName).clear();
+      return true;
+    } catch (e) {
+      Constants.errorMessage(description: '$e in clearBox');
       return false;
     }
   }

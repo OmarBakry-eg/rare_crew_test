@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:rare_crew_test/src/resources/database/hive_operations.dart';
+import 'package:rare_crew_test/src/providers/auth_notifier_controller/auth_notifier_controller.dart';
+import 'package:rare_crew_test/src/resources/database/hive_database.dart';
 import 'package:rare_crew_test/src/view/pages/home/widgets/no_tasks_widget.dart';
 import 'package:rare_crew_test/src/view/pages/home/widgets/tasks_list_widget.dart';
+import 'package:rare_crew_test/src/view/utils/extensions.dart';
 import 'package:rare_crew_test/src/view/utils/my_colors.dart';
 import 'package:intl/intl.dart' as intl;
 
@@ -16,7 +19,7 @@ class HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Database database = Database();
+    final HiveDatabase database = HiveDatabase();
 
     return Center(
       heightFactor: 1.8,
@@ -41,36 +44,47 @@ class HomeContent extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Text.rich(
-                      TextSpan(
-                        style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontSize: 20,
-                          color: Color(0xff172735),
-                          letterSpacing: 0.42,
+                    Consumer(
+                        builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                      final AuthNotifierController controller =
+                          ref.read(authNotifierController.notifier);
+                           final AuthNotifierController data =
+                  ref.watch(authNotifierController);
+                      // WidgetsBinding.instance
+                      //     .addPostFrameCallback((_) =>
+                     controller.getUserName();
+                      //);
+                      return Text.rich(
+                        TextSpan(
+                          style: const TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 20,
+                            color: Color(0xff172735),
+                            letterSpacing: 0.42,
+                          ),
+                          children: [
+                            const TextSpan(
+                              text: 'Good Morning',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w300,
+                              ),
+                            ),
+                            const TextSpan(
+                              text: ' ',
+                            ),
+                            TextSpan(
+                              text: data.username.capitalize,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
-                        children: [
-                          TextSpan(
-                            text: 'Good Morning',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                          TextSpan(
-                            text: ' ',
-                          ),
-                          TextSpan(
-                            text: 'John',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      textHeightBehavior:
-                          TextHeightBehavior(applyHeightToFirstAscent: false),
-                      softWrap: false,
-                    ),
+                        textHeightBehavior:
+                            const TextHeightBehavior(applyHeightToFirstAscent: false),
+                        softWrap: false,
+                      );
+                    }),
                     const SizedBox(
                       height: 10,
                     ),
@@ -105,17 +119,29 @@ class HomeContent extends StatelessWidget {
               height: 20,
             ),
             isLogout
-                ? RegButton(
-                    title: 'Logout',
-                    fontWeight: FontWeight.w700,
-                    borderColor: Colors.red,
-                    onTap: () {
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (c) => const LoginPage(
-                                    isSignup: false,
-                                  )));
+                ? Consumer(
+                    builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                      final AuthNotifierController controller =
+                          ref.read(authNotifierController.notifier);
+                      return RegButton(
+                        title: 'Logout',
+                        fontWeight: FontWeight.w700,
+                        borderColor: Colors.red,
+                        onTap: () async {
+                          controller.logout().then((value) {
+                            if (value) {
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (c) => const LoginPage(
+                                            isSignup: false,
+                                          )),
+                                  (r) => false);
+                            }
+                            return value;
+                          });
+                        },
+                      );
                     },
                   )
                 : ValueListenableBuilder(
